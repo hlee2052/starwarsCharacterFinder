@@ -1,6 +1,6 @@
 {
-  "name": "starwarscharacterfinder",
-  "version": "1.0.0",
+  "name": "starwars_character_finder",
+  "version": "1.0.14",
   "description": "",
   "main": "index.js",
   "scripts": {

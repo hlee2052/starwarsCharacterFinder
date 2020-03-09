@@ -73,7 +73,7 @@ fetchData(url).then(data => {
     let object = {"characters": data}
     fs.writeFile("characters.json", JSON.stringify(object), (err) => {
         if (err) {
-            console.log("fail write");
+            console.log("fail to write");
         } else {
             console.log("Successfully loaded characters with count: " + data.length);
         }

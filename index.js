@@ -91,7 +91,6 @@ function searchByName(name, exact = false) {
     })
 }
 
-
 /*
     name: aa
     height: aa
@@ -99,7 +98,7 @@ function searchByName(name, exact = false) {
     hair : aa
  */
 
-let object = {
+let object2 = {
     "name": "Luke Skywalker",
     "height": "172",
     "mass": "77",
@@ -133,12 +132,97 @@ let object = {
 }
 
 
-function searchByParam(object) {
+let object = {
+    "name": "Luke Skywalker",
+    "height": "172",
+    "mass": "77",
+    "hair_color": "blond",
+    "skin_color": "fair",
+    "eye_color": "blue",
+    "gender": "male",
+}
 
+let newQuery = {
+    /* Return item that satisfies everything in AND
+    or item that satisifies any one of OR Clause
+
+    eg) I want people (contains name "Luke' who is at least 100 cm tall ) OR (gender is female, or eye is blue)
+    --> returns Luke Skywalker,       every female or people whose eye is blue
+    make sure not to include duplicates
+     */
+    "AND": [
+        {
+            name: "Luke",
+            name_exact: true
+        },
+        {
+            height_lo: 100,
+            height_hi: 140
+        },
+        {
+            hair_color: 'blue'
+        },
+        {
+            mass_lo: 10,
+            mass_hi: 10
+        }
+
+    ],
+    "OR": [
+        {
+            skin_color: "pale"
+        },
+        {
+            eye_color: "blue"
+        },
+        {gender: 'male'}
+
+    ]
 }
 
 
+const queryList = [
+    {
+        name: '',
+        name_exact: false
+    },
+    {
+        height_lo: 0,
+        height_hi: 0
+    },
+    {
+        mass_lo: 0,
+        mass_hi: 0
+    },
+    {hair_color: ''},
+    {skin_color: ''},
+    {eye_color: ''},
+    {gender: ''}
+]
 
+
+//eg: name contains "Skywalker'  or height(between 120-190) or mass =77 and hair color_blond and eye_color blue
+//  and any gender
+
+function searchByParam(query) {
+    return new Promise((resolve, reject) => {
+        let result = []
+
+        let andList = query['AND']
+        let orList = query['OR']
+        if ((andList === undefined || !Array.isArray(andList)) || (orList === undefined) || !Array.isArray(orList)) {
+            //  At least one AND or OR clause must exist!
+        }
+
+        /*
+        1. create OR query
+        2. run the query
+         */
+
+
+    })
+
+}
 
 
 module.exports = {

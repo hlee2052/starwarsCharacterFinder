@@ -18,16 +18,18 @@ const fs = require('fs')
   list of characters
 */
 
+
 // Recursively fetch new data
-function fetchData(url, data =[]) {
+function fetchData(url, data = []) {
     return fetch(url)
         .then((response) => {
             return response.json();
         })
         .then((res) => {
-            let currentResult = res.results;
+            let currentResult = processData(res.results);
             let characterList = data;
-            characterList = [...characterList,...currentResult];
+
+            characterList = [...characterList, ...currentResult];
             if (res.next != null) {
                 return fetchData(res.next, characterList)
             }
@@ -35,13 +37,41 @@ function fetchData(url, data =[]) {
         });
 }
 
+/*
+TODO
+1) some values are 'unknown' or 'none'
+2) values are in String format... if they are over 999, eg) 1042 then the data is represented as '1,042'
+--> convert into 1042 instead
+3)
+
+ */
+
+// { 'male', 'n/a', 'female', 'hermaphrodite', 'none' }
+let genderSet = new Set();
+
+function processData(array) {
+
+    for (let i = 0; i < array.length; i++) {
+        // remove comma from mass index
+        if (array[i]['mass'].indexOf(',') !== -1) {
+            array[i]['mass'] = array[i]['mass'].replace(',', '')
+        }
+
+        // extract list of genders
+        if (!genderSet.has(array[i]['gender'])) {
+            genderSet.add(array[i]['gender'])
+        }
+    }
+
+    return array;
+}
+
 const url = 'https://swapi.co/api/people/?page=1';
-
 // save to a file
-fetchData(url).then(data=> {
-    let object = {"characters":data}
 
-    fs.writeFile("characters.json", JSON.stringify(object), (err)=> {
+fetchData(url).then(data => {
+    let object = {"characters": data}
+    fs.writeFile("characters.json", JSON.stringify(object), (err) => {
         if (err) {
             console.log("fail write");
         } else {

@@ -30,6 +30,7 @@ Starwars Character Finder
  ```
 
  3. Example:
+ ```javascript
          let queryObject = {
              "AND": [
                  {
@@ -52,9 +53,11 @@ Starwars Character Finder
 
 const sw = require('starwars_character_finder');
 sw.searchCharacter(queryObject).then(res=>(console.log(res))
-
+```
 -----
 returns the items that satisfies the AND clause + OR clause
+
+```javascript
 
 [
    {
@@ -395,3 +398,4 @@ returns the items that satisfies the AND clause + OR clause
       "url":"https://swapi.co/api/people/78/"
    }
 ]
+```

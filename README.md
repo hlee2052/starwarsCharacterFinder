@@ -10,7 +10,7 @@ Starwars Character Finder
     let query = {"AND":[], "OR":[]}
 
 2. In either AND or OR array, one can add one of the following objects...
-
+```javascript
    {
         name: String,
         name_exact: Boolean
@@ -27,7 +27,7 @@ Starwars Character Finder
     {skin_color: String},
     {eye_color: String},
     {gender: String}
-
+ ```
 
  3. Example:
          let queryObject = {

@@ -1,16 +1,6 @@
 const fs = require('fs')
 const path = require('path')
 let characterArray = require('./characters.json')
-//console.log(characterArray)
-/*try {
-    let filePath = path.resolve(__dirname, 'characters.json' )
-    characterArray = fs.readFileSync(filePath, 'utf8')
-} catch (e) {
-    console.log(e.toString())
-    console.log("Failed to read file!")
-}*/
-
-
 characterArray = characterArray['characters']
 
 function searchByGender(gender = '') {
@@ -215,45 +205,36 @@ function searchCharacter(query) {
             //  At least one AND or OR clause must exist!
             reject(result)
         }
-        /*
-        1. create OR query
-        2. run the query
-         */
-        // loop through characters
+        // For each character, compute whether AND or OR queries are satisfied
         for (let i = 0; i < characterArray.length; i++) {
             let currentChar = characterArray[i]
-            // all list must be true;
-            if (andList.length === 0) {
-                // this object should not be added;
-                continue;
-            }
-
             let andClause = true;
+            if (andList.length === 0) {
+                andClause = false
+            }
             for (let curr of andList) {
                 andClause = checkEachClause(curr, currentChar)
                 if (!andClause) {
-                    // this object does not satisify and clause
+                    // stop checking AND clause if any item returns false
                     break;
                 }
             }
-
             let orClause = false;
             for (let curr of orList) {
                 orClause |= checkEachClause(curr, currentChar)
+                // No need to check other items if one is true in OR clause
                 if (orClause) break;
             }
-
             if ((andClause || orClause) && !set.has(currentChar["name"])) {
                 result.push(currentChar);
                 set.add(currentChar["name"])
             }
         }
-        // console.log(result)
         resolve(result)
     })
-
 }
 
+// check the truth of each items in either AND or OR clause
 function checkEachClause(currAnd, currentChar) {
     // each AND object must only contain EITHER one or two, thus check length...
     // eg) invalid: {name:"Luke", height_lo: "..."} --> name and height cannot be together
@@ -274,7 +255,6 @@ function checkEachClause(currAnd, currentChar) {
     }
     return false;
 }
-
 
 function checkName(clause, currentChar) {
     // only two clauses name, name_exact
@@ -299,32 +279,40 @@ function checkHeight(clause, currentChar) {
 function checkMass(clause, currentChar) {
     if (Object.keys(clause).length !== 2 || !"mass_hi" in clause) return false;
 
-    let currentCharHeight = currentChar['mass'];
+    let currentCharMass = currentChar['mass'];
     let loLimit = clause['mass_lo']
     let hiLimit = clause['mass_hi']
 
-    return currentCharHeight >= loLimit && currentCharHeight <= hiLimit;
+    return currentCharMass >= loLimit && currentCharMass <= hiLimit;
 }
 
 function checkHairColor(clause, currentChar) {
     if (Object.keys(clause).length !== 1) return false;
-    return currentChar['hair_color'] === clause['hair_color']
+    return currentChar['hair_color'].includes(clause['hair_color'])
 }
 
 function checkSkinColor(clause, currentChar) {
     if (Object.keys(clause).length !== 1) return false;
-    return currentChar['skin_color'] === clause['skin_color']
+    return currentChar['skin_color'].includes(clause['skin_color'])
 }
 
 function checkEyeColor(clause, currentChar) {
     if (Object.keys(clause).length !== 1) return false;
-    return currentChar['eye_color'] === clause['eye_color']
+    return currentChar['eye_color'].includes(clause['eye_color'])
 }
 
 function checkGender(clause, currentChar) {
     if (Object.keys(clause).length !== 1) return false;
     return currentChar['gender'] === clause['gender']
 }
+// add new entry
+function addNewEntry() {
+    return new Promise((resolve, reject)=> {
+
+
+    })
+}
+
 
 /*
 searchCharacter(newQuery).then(result => {
@@ -332,7 +320,6 @@ searchCharacter(newQuery).then(result => {
 }).catch(err => {
     console.log(err)
 })
-
 */
 
 module.exports = {

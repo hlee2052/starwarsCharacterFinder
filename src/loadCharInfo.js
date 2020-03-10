@@ -71,7 +71,7 @@ const url = 'https://swapi.co/api/people/?page=1';
 
 fetchData(url).then(data => {
     let object = {"characters": data}
-    fs.writeFile("characters.json", JSON.stringify(object), (err) => {
+    fs.writeFile("src/characters.json", JSON.stringify(object), (err) => {
         if (err) {
             console.log("fail to write");
         } else {

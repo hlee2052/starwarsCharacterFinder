@@ -326,12 +326,14 @@ function checkGender(clause, currentChar) {
     return currentChar['gender'] === clause['gender']
 }
 
+/*
 searchCharacter(newQuery).then(result => {
     console.log(result)
 }).catch(err => {
     console.log(err)
 })
 
+*/
 
 module.exports = {
     searchByHeight,

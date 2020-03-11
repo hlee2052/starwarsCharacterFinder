@@ -23,7 +23,7 @@ npm install starwars_character_finder
     AND or OR array can contain any number of the following objects
     TODO
     specify values
-  {
+   {
         name: String,
         name_exact: Boolean
     },
@@ -39,6 +39,17 @@ npm install starwars_character_finder
     {skin_color: String},
     {eye_color: String},
     {gender: String}
+
+
+
+    example:
+    
+   let queryObject = { "AND": [ { name: "Sky", name_exact: false } ],
+                      "OR": [ { mass_lo: 1000, mass_hi: 5000 },
+                      { eye_color: 'NON EXISTENT - OR will ignore this' }, 
+                      { skin_color: 'blue' }] 
+                      }
+
 
     const sw = require('starwars_character_finder');
     sw.searchCharacter(query).then(res=>(console.log(res))

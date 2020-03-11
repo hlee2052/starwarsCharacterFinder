@@ -10,7 +10,7 @@ Starwars Character Finder
     let query = {"AND":[], "OR":[]}
 
 2. In either AND or OR array, one can add one of the following objects...
-
+```javascript
    {
         name: String,
         name_exact: Boolean
@@ -27,9 +27,10 @@ Starwars Character Finder
     {skin_color: String},
     {eye_color: String},
     {gender: String}
-
+ ```
 
  3. Example:
+ ```javascript
          let queryObject = {
              "AND": [
                  {
@@ -52,9 +53,11 @@ Starwars Character Finder
 
 const sw = require('starwars_character_finder');
 sw.searchCharacter(queryObject).then(res=>(console.log(res))
-
+```
 -----
 returns the items that satisfies the AND clause + OR clause
+
+```javascript
 
 [
    {
@@ -395,3 +398,4 @@ returns the items that satisfies the AND clause + OR clause
       "url":"https://swapi.co/api/people/78/"
    }
 ]
+```

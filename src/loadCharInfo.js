@@ -48,6 +48,8 @@ TODO
 
 // { 'male', 'n/a', 'female', 'hermaphrodite', 'none' }
 let genderSet = new Set();
+let hairColorSet = new Set();
+let skinColorSet = new Set();
 
 function processData(array) {
 

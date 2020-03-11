@@ -42,7 +42,7 @@ npm install starwars_character_finder
 
 
 
-    example:
+   example 1 - Find characters based on search param:
     
    let queryObject = { "AND": [ { name: "Sky", name_exact: false } ],
                       "OR": [ { mass_lo: 1000, mass_hi: 5000 },
@@ -53,6 +53,15 @@ npm install starwars_character_finder
 
     const sw = require('starwars_character_finder');
     sw.searchCharacter(query).then(res=>(console.log(res))
+
+
+  example 2 - Add/remove characters:
+  let addQuery = {"name":"New Person", "eye_color": "blue"}
+  - if addQuery has no "name" key or trying to add an existing character (eg, Luke Skywalker), then rejects promise
+  
+  sw.addNewEntry(addQuery).then(res=>()).catch(err=>())
+  
+  sw.removeEntry('Luke Skywalker').then(res=>())
 
 ```
 

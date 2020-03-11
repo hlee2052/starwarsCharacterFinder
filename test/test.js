@@ -1,10 +1,8 @@
 let expect = require("chai").expect;
 let starwars = require("../src/index");
-let testCharacters = require('../src/characters.json')
-
+//let testCharacters = require('../src/characters.json')
 
 console.log('Starting Unit Test')
-
 
 describe('testSearchCharacter', () => {
 
@@ -65,7 +63,7 @@ describe('testSearchCharacter', () => {
             "OR": []
         }
 
-        let expectedCharOne = getCharacterFromTestData("Luke Skywalker")['name']
+        let expectedCharOne = 'Luke Skywalker'
 
         let nameSet = new Set();
         nameSet.add(expectedCharOne)
@@ -218,7 +216,7 @@ describe('testSearchCharacter', () => {
         }
 
         return starwars.searchCharacter(queryObject).then(res => {
-            console.log(res)
+            //console.log(res)
             expect(res.length).to.equal(nameSet.size)
             for (let curr of res) {
                 nameSet.delete(curr['name'])
@@ -229,9 +227,74 @@ describe('testSearchCharacter', () => {
         })
     })
 
-    function getCharacterFromTestData(name) {
-        return testCharacters['characters'].find(o => o.name === name)
-    }
+
 })
+
+describe('testAddNewEntry', () => {
+
+    it('testEmptyObject', () => {
+        let query = {}
+        return starwars.addNewEntry(query).then(res => {
+            expect.fail()
+        }).catch((err) => {
+        })
+    })
+
+    // test query with no 'name' key
+    it('testNoNameInQuery', () => {
+        let query = {eye_color: 'blue'}
+        return starwars.addNewEntry(query).then(res => {
+            expect.fail()
+        }).catch((err) => {
+        })
+    })
+
+    // test name with empty value
+    it('testNameWithEmptyValue', () => {
+        let query = {name: '', eye_color: 'blue'}
+        return starwars.addNewEntry(query).then(res => {
+            expect.fail()
+        }).catch((err) => {
+        })
+    })
+
+    // test name that is unique
+    it('testUniqueNameInQuery', () => {
+        // Mickey is not in Starwars universe
+        let uniqueName = 'Mickey Mouse'
+        let originalCount = starwars.getOriginalData().length
+        let query = {name: uniqueName, eye_color: 'blue'}
+        let newArrayLength
+
+        return starwars.addNewEntry(query).then(res => {
+            newArrayLength = starwars.getOriginalData().length
+            // should increase by one
+            expect(newArrayLength).to.equal(originalCount + 1)
+        }).then(() => {
+            starwars.removeEntry(uniqueName).then((res) => {
+                // successfully removed, back to original Count
+                newArrayLength = starwars.getOriginalData().length
+                expect(newArrayLength).to.equal(originalCount)
+            })
+        }).catch((err) => {
+            expect.fail()
+        })
+    })
+
+    // adding existing name should reject the promise
+    it('testExistingNameInQuery', () => {
+        let existingUser = starwars.getOriginalData()[0]['name']
+        let query = {name: existingUser, eye_color: 'blue'}
+        return starwars.addNewEntry(query).then(res => {
+            expect.fail()
+        }).catch((err) => {
+        })
+    })
+})
+
+/*function getCharacterFromTestData(name) {
+    return testCharacters['characters'].find(o => o.name === name)
+}*/
+
 
 

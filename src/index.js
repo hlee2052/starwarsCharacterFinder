@@ -1,7 +1,8 @@
 const fs = require('fs')
 const path = require('path')
-let characterArray = require('./characters.json')
-characterArray = characterArray['characters']
+let jsonFile = require('./characters.json')
+let characterArray = jsonFile['characters']
+
 
 function searchByGender(gender = '') {
     // Gender is one of { 'male', 'n/a', 'female', 'hermaphrodite', 'none' }
@@ -305,26 +306,83 @@ function checkGender(clause, currentChar) {
     if (Object.keys(clause).length !== 1) return false;
     return currentChar['gender'] === clause['gender']
 }
+
+
+function getObjectTemplate() {
+    return {
+        name: '',
+        height: '',
+        mass: '',
+        hair_color: '',
+        skin_color: '',
+        eye_color: '',
+        birth_year: '',
+        gender: '',
+        homeworld: '',
+        films: [],
+        species: [],
+        vehicles: [],
+        starships: [],
+        created: '',
+        edited: '',
+        url: ''
+    }
+}
+
 // add new entry
-function addNewEntry() {
-    return new Promise((resolve, reject)=> {
+function addNewEntry(object) {
+    return new Promise((resolve, reject) => {
+        if (object === undefined || Object.keys(object).length === 0 || !'name' in object) {
+            reject("fail")
+        } else {
+            let name = object['name']
+            // see if exists
+            searchByName(name, true).then((res) => {
+                // cannot add entry if name exists!
+                if (res.length !== 0) {
+                    reject("fail")
+                    return;
+                }
+            }).then((res) => {
+                characterArray.push(object)
+                resolve(true)
+            })
+        }
+    })
+}
 
-
+function removeEntry(name) {
+    return new Promise((resolve, reject) => {
+        for (let i = characterArray.length - 1; i >= 0; --i) {
+            if (characterArray[i].name === name) {
+                characterArray.splice(i, 1);
+            }
+        }
+        resolve(true)
     })
 }
 
 
-/*
-searchCharacter(newQuery).then(result => {
+function getOriginalData() {
+    return characterArray
+}
+
+/*searchCharacter(newQuery).then(result => {
     console.log(result)
 }).catch(err => {
     console.log(err)
-})
-*/
+})*/
+
+//addNewEntry({'name':'Luke Skywalker'}).then(res=>console.log("ffff")).catch(err=>console.log("dddd"))
+
 
 module.exports = {
     searchByHeight,
     searchByMass,
     searchByGender,
-    searchCharacter
+    searchCharacter,
+    addNewEntry,
+    getOriginalData,
+    removeEntry
+
 }

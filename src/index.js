@@ -1,95 +1,11 @@
 const fs = require('fs')
 const path = require('path')
-let jsonFile = require('./characters.json')
-let characterArray = jsonFile['characters']
+let characterJsonFile = require('./characters.json')
+let infoJsonFile = require('./info.json')
+let characterArray = characterJsonFile['characters']
 
-
-function searchByGender(gender = '') {
-    // Gender is one of { 'male', 'n/a', 'female', 'hermaphrodite', 'none' }
-    if (gender.length === 0) return characterArray
-
-    let genderSet = new Set()
-    // TODO, gender types are to be read by external file in the future
-    genderSet.add('male').add('n/a').add('female').add('hermaphrodite').add('none')
-
-    return new Promise((resolve, reject) => {
-        let result = []
-        if (!genderSet.has(gender)) resolve(result)
-
-        for (let i = 0; i < characterArray.length; i++) {
-            let currentCharacter = characterArray[i];
-            if (currentCharacter.gender === gender) {
-                result.push(currentCharacter)
-            }
-        }
-        resolve(result)
-    })
-}
-
-function searchByHeight(lo = 0, hi = 0) {
-    return new Promise((resolve, reject) => {
-        let result = [];
-        if (isNaN(lo) || isNaN(hi)) resolve(result);
-        if (lo === 0 && hi === 0) resolve(characterArray);
-        for (let i = 0; i < characterArray.length; i++) {
-            let currentCharacter = characterArray[i];
-            if (currentCharacter.height >= lo && currentCharacter.height <= hi) {
-                result.push(currentCharacter)
-            }
-        }
-        resolve(result)
-    })
-}
-
-// search By Height and Mass is basically identical code, but will separate it for future update
-// Supports range query
-function searchByMass(lo = 0, hi = 0) {
-    return new Promise((resolve, reject) => {
-        let result = [];
-        if (isNaN(lo) || isNaN(hi)) reject(result)
-        if (lo === 0 && hi === 0) resolve(characterArray)
-        for (let i = 0; i < characterArray.length; i++) {
-            let currentCharacter = characterArray[i];
-            if (currentCharacter.mass >= lo && currentCharacter.mass <= hi) {
-                result.push(currentCharacter)
-            }
-        }
-        resolve(result)
-    })
-}
-
-// Supports either exact, or contains word
-function searchByName(name, exact = false) {
-    name = name.toLowerCase()
-    return new Promise((resolve, reject) => {
-        let result = []
-        if (typeof exact !== "boolean") reject(result)
-
-        for (let i = 0; i < characterArray.length; i++) {
-            let curr = characterArray[i]
-            let currentName = curr.name.toLowerCase();
-            if (exact) {
-                if (currentName === name) {
-                    result.push(curr)
-                }
-            } else {
-                if (currentName.includes(name)) {
-                    result.push(curr)
-                }
-            }
-        }
-        resolve(result)
-    })
-}
-
-/*
-    name: aa
-    height: aa
-    mass: aa
-    hair : aa
- */
-
-let object2 = {
+// example character info
+let example = {
     "name": "Luke Skywalker",
     "height": "172",
     "mass": "77",
@@ -122,17 +38,6 @@ let object2 = {
     "url": "https://swapi.co/api/people/1/"
 }
 
-
-let object = {
-    "name": "Luke Skywalker",
-    "height": "172",
-    "mass": "77",
-    "hair_color": "blond",
-    "skin_color": "fair",
-    "eye_color": "blue",
-    "gender": "male",
-}
-
 let newQuery = {
     /* Return item that satisfies everything in AND
     or item that satisifies any one of OR Clause
@@ -157,12 +62,6 @@ let newQuery = {
         {
             gender: 'male'
         }
-        /*
-            {
-                hair_color: 'blue'
-            },
-           */
-
     ],
     "OR": [
         {gender: 'n/a'}
@@ -192,7 +91,6 @@ const queryList = [
 
 //eg: name contains "Skywalker'  or height(between 120-190) or mass =77 and hair color_blond and eye_color blue
 //  and any gender
-
 
 function searchCharacter(query) {
     return new Promise((resolve, reject) => {
@@ -362,19 +260,95 @@ function removeEntry(name) {
     })
 }
 
-
 function getOriginalData() {
     return characterArray
 }
 
-/*searchCharacter(newQuery).then(result => {
-    console.log(result)
-}).catch(err => {
-    console.log(err)
-})*/
+function searchByGender(gender = '') {
+    if (gender.length === 0) return characterArray
+    let genderSet = new Set()
+    let genderList = infoJsonFile['gender']
+    console.log(genderList)
+    for (let gender of genderList) {
+        genderSet.add(gender)
+    }
 
-//addNewEntry({'name':'Luke Skywalker'}).then(res=>console.log("ffff")).catch(err=>console.log("dddd"))
+    return new Promise((resolve, reject) => {
+        let result = []
+        if (!genderSet.has(gender)) resolve(result)
 
+        for (let character of characterArray) {
+            if (character.gender === gender) result.push(character)
+        }
+        resolve(result)
+    })
+}
+
+function searchByHeight(lo = 0, hi = 0) {
+    return new Promise((resolve, reject) => {
+        let result = [];
+        if (isNaN(lo) || isNaN(hi)) resolve(result);
+        if (lo === 0 && hi === 0) resolve(characterArray);
+        for (let i = 0; i < characterArray.length; i++) {
+            let currentCharacter = characterArray[i];
+            if (currentCharacter.height >= lo && currentCharacter.height <= hi) {
+                result.push(currentCharacter)
+            }
+        }
+        resolve(result)
+    })
+}
+
+// search By Height and Mass is basically identical code, but will separate it for future update
+// Supports range query
+function searchByMass(lo = 0, hi = 0) {
+    return new Promise((resolve, reject) => {
+        let result = [];
+        if (isNaN(lo) || isNaN(hi)) reject(result)
+        if (lo === 0 && hi === 0) resolve(characterArray)
+        for (let i = 0; i < characterArray.length; i++) {
+            let currentCharacter = characterArray[i];
+            if (currentCharacter.mass >= lo && currentCharacter.mass <= hi) {
+                result.push(currentCharacter)
+            }
+        }
+        resolve(result)
+    })
+}
+
+// Supports either exact, or contains word
+function searchByName(name, exact = false) {
+    name = name.toLowerCase()
+    return new Promise((resolve, reject) => {
+        let result = []
+        if (typeof exact !== "boolean") reject(result)
+
+        for (let i = 0; i < characterArray.length; i++) {
+            let curr = characterArray[i]
+            let currentName = curr.name.toLowerCase();
+            if (exact) {
+                if (currentName === name) {
+                    result.push(curr)
+                }
+            } else {
+                if (currentName.includes(name)) {
+                    result.push(curr)
+                }
+            }
+        }
+        resolve(result)
+    })
+}
+
+function getParameterDetails() {
+    return new Promise((resolve, reject) => {
+        if (infoJsonFile) {
+            resolve(infoJsonFile)
+        } else {
+            reject("fail")
+        }
+    })
+}
 
 module.exports = {
     searchByHeight,
@@ -383,6 +357,6 @@ module.exports = {
     searchCharacter,
     addNewEntry,
     getOriginalData,
-    removeEntry
-
+    removeEntry,
+    getParameterDetails
 }

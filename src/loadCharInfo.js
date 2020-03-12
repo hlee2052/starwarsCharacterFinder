@@ -18,9 +18,8 @@ const fs = require('fs')
   list of characters
 */
 
-
 // Recursively fetch new data
-function fetchData(url, data = []) {
+function fetchDataFromSWAPI(url, data = []) {
     return fetch(url)
         .then((response) => {
             return response.json();
@@ -31,53 +30,97 @@ function fetchData(url, data = []) {
 
             characterList = [...characterList, ...currentResult];
             if (res.next != null) {
-                return fetchData(res.next, characterList)
+                return fetchDataFromSWAPI(res.next, characterList)
             }
             return characterList
         });
 }
 
-/*
-TODO
-1) some values are 'unknown' or 'none'
-2) values are in String format... if they are over 999, eg) 1042 then the data is represented as '1,042'
---> convert into 1042 instead
-3)
-
- */
-
 // { 'male', 'n/a', 'female', 'hermaphrodite', 'none' }
 let genderSet = new Set();
 let hairColorSet = new Set();
 let skinColorSet = new Set();
+let eyeColorSet = new Set();
+
+// mass and height range
+let heightLo = Number.MAX_VALUE;
+let heightHi = Number.MIN_VALUE;
+
+let massLo = Number.MAX_VALUE;
+let massHi = Number.MIN_VALUE;
 
 function processData(array) {
-
     for (let i = 0; i < array.length; i++) {
-        // remove comma from mass index
-        if (array[i]['mass'].indexOf(',') !== -1) {
-            array[i]['mass'] = array[i]['mass'].replace(',', '')
-        }
+        let currentElement = array[i]
 
-        // extract list of genders
-        if (!genderSet.has(array[i]['gender'])) {
-            genderSet.add(array[i]['gender'])
+        // remove comma from mass index
+        if (currentElement['mass'].indexOf(',') !== -1) {
+            currentElement['mass'] = currentElement['mass'].replace(',', '')
+        }
+        genderSet.add(currentElement['gender'])
+        hairColorSet.add(currentElement['hair_color'])
+        skinColorSet.add(currentElement['skin_color'])
+        eyeColorSet.add(currentElement['eye_color'])
+
+        let currentHeight = currentElement['height']
+        let currentMass = currentElement['mass']
+        if (!isNaN(currentHeight)) {
+            heightLo = Math.min(heightLo, currentHeight)
+            heightHi = Math.max(heightHi, currentHeight)
+        }
+        if (!isNaN(currentMass)) {
+            massLo = Math.min(massLo, currentMass)
+            massHi = Math.max(massHi, currentMass)
         }
     }
-
     return array;
 }
 
 const url = 'https://swapi.co/api/people/?page=1';
-// save to a file
 
-fetchData(url).then(data => {
+// save to a file
+fetchDataFromSWAPI(url).then(data => {
     let object = {"characters": data}
-    fs.writeFile("src/characters.json", JSON.stringify(object), (err) => {
-        if (err) {
-            console.log("fail to write");
-        } else {
-            console.log("Successfully loaded characters with count: " + data.length);
-        }
+    let writeCharacters =
+        new Promise((resolve, reject) => {
+            fs.writeFile(__dirname + "/characters.json", JSON.stringify(object), (err) => {
+                if (err) {
+                    console.log(err)
+                    console.log("fail to write characters.json");
+                    reject('fail')
+                } else {
+                    console.log("Successfully loaded characters with count: " + data.length);
+                    resolve('ok')
+                }
+            })
+        })
+
+    let writeInfo =
+        new Promise((resolve, reject) => {
+            fs.writeFile(__dirname + "/info.json", JSON.stringify(generateInfo()), (err) => {
+                if (err) {
+                    console.log("fail to write characters.json");
+                } else {
+                    console.log("Successfully loaded info")
+                }
+            })
+        })
+
+    let promiseList = [writeCharacters, writeInfo]
+    Promise.all(promiseList).then(() => {
+        console.log('complete fetch....')
     })
 })
+
+function generateInfo() {
+    let infoObject = {}
+    infoObject.gender = Array.from(genderSet)
+    infoObject.hair_color = Array.from(hairColorSet)
+    infoObject.skin_color = Array.from(skinColorSet)
+    infoObject.eye_color = Array.from(eyeColorSet)
+    infoObject.height_min = heightLo
+    infoObject.height_max = heightHi
+    infoObject.mass_min = massLo
+    infoObject.mass_max = massHi
+    return infoObject
+}

@@ -8,61 +8,127 @@
   </a>
 </p>
 
-> npm  package to search starwars characters based on certain attributes
+> A npm  package to search Starwars characters based on certain attributes, such as gender, eye color and skin color
+>
+>Data derived from www.swapi.co
 
 ## Install
 
 ```sh
 npm install starwars_character_finder
 ```
+## Repo Overview (FYI only)
+- data is obtained from www.swapi.co
+- loadCharInfo.js parses info from swapi.co and creates json files to be read
+- index.js - implements functions
+- test.js - test cases for the operations
 
 ## Usage
+**To import**:
+```javascript
+const sw = require('starwars_character_finder')
+```
+**To Search for character based on attributes, such as height, eye color, etc:**
+```javascript
+sw.searchCharacter(query).then(res=>(console.log(res))
+```
+where query is a JavaScript object in the following form:
 
-```sh
-  let query = {"AND":[], "OR":[]}
-    AND or OR array can contain any number of the following objects
-    TODO
-    specify values
-   {
-        name: String,
-        name_exact: Boolean
-    },
-    {
-        height_lo: Integer,
-        height_hi: Integer
-    },
-    {
-        mass_lo: Integer,
-        mass_hi: Integer
-    },
-    {hair_color: String},
-    {skin_color: String},
-    {eye_color: String},
-    {gender: String}
+```javascript
+let query = {"AND":[], "OR":[]}
 
+// query will get items that match all items in AND and any one item in OR
+```
+and the AND or OR array can have any of the following object:
 
+```javascript
+     {
+          name: String,
+          name_exact: Boolean
+      },
+      {
+          height_lo: Integer,
+          height_hi: Integer
+      },
+      {
+          mass_lo: Integer,
+          mass_hi: Integer
+      },
+      {hair_color: String},
+      {skin_color: String},
+      {eye_color: String},
+      {gender: String}
+```
+sample data:
 
-   example 1 - Find characters based on search param:
-    
-   let queryObject = { "AND": [ { name: "Sky", name_exact: false } ],
-                      "OR": [ { mass_lo: 1000, mass_hi: 5000 },
-                      { eye_color: 'NON EXISTENT - OR will ignore this' }, 
-                      { skin_color: 'blue' }] 
-                      }
+| hair_color        | skin_color           | eye_color  |
+| ------------- |:-------------:| -----:| 
+| none      | none | blue | 
+| n/a      | gold      |   yellow |
+| blonde | white      |    red |
+| brown | blue      |    brown |
+| grey | light      |    blue-gray |
+| black | red      |    black |
+| auburn | unknown      |    orange |
+| white | green      |    hazel |
+| unknown | green-tan      |    pink |
+|  | brown      |    unknown |
+|  | pale      |    blue |
+|  | metal      |    gold |
+|  | dark      |    green |
+|  | brown mottle      |   white |
+|  | grey      |    dark |
+|  | yellow      |     |
+|  | silver     |     |
+|  | fair     |     |
 
+height range : 66 - 264 cm
 
-    const sw = require('starwars_character_finder');
-    sw.searchCharacter(query).then(res=>(console.log(res))
+mass range: 15, 1358 kg
 
+name_exact : true for exact search, false for partial match
 
-  example 2 - Add/remove characters:
-  let addQuery = {"name":"New Person", "eye_color": "blue"}
-  - if addQuery has no "name" key or trying to add an existing character (eg, Luke Skywalker), then rejects promise
-  
-  sw.addNewEntry(addQuery).then(res=>()).catch(err=>())
-  
+To get complete details on above data as JSON, 
+```javascript
+sw.getParameterDetails().then(res=>(console.log(res)))
+````
+**Complete example for searching**:
+```javascript
+let query = {
+               "AND":[
+                  {
+                     "name":"Sky",
+                     "name_exact":false
+                  }
+               ],
+               "OR":[
+                  {
+                     "mass_lo":150,
+                     "mass_hi":1900
+                  },
+                  {
+                     "eye_color":"SOME INVALID ITEM"
+                  },
+                  {
+                     "skin_color":"blue"
+                  }
+               ]
+            }
+sw.searchCharacter(query).then(res=>(console.log(res))) 
+```
+**To add/remove characters**
+
+Add - If query has no "name" key or tries to add an existig character (eg, Luke Skywalker), then promise is rejected
+```javascript
+let addQuery = {
+   "name":"New Person",
+   "eye_color":"blue"
+}
+sw.addNewEntry(addQuery).then(res=>(...)).catch(err=>(...))
+```
+Remove - Remove based on name
+```javascript
   sw.removeEntry('Luke Skywalker').then(res=>())
-
 ```
 
 ## Run tests

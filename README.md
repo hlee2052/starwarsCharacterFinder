@@ -1,4 +1,5 @@
 <h1 align="center">Welcome to starwars_character_finder 👋</h1>
+https://www.npmjs.com/package/starwars_character_finder
 <p>
   <a href="https://www.npmjs.com/package/starwars_character_finder" target="_blank">
     <img alt="Version" src="https://img.shields.io/npm/v/starwars_character_finder.svg">

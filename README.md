@@ -18,10 +18,10 @@ https://www.npmjs.com/package/starwars_character_finder
 ```sh
 npm install starwars_character_finder
 ```
-## Repo Overview (FYI only)
+## Overview
 - data is obtained from www.swapi.co
-- loadCharInfo.js parses info from swapi.co and creates json files to be read
-- index.js - implements functions
+- loadCharInfo.js parses information from swapi.co and creates json files to be read
+- index.js - contains the implementations
 - test.js - test cases for the operations
 
 ## Usage
